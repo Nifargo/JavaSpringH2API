@@ -1,0 +1,44 @@
+version: '3'
+services:
+  database:
+    image: postgres:15-alpine
+    container_name: my-database
+    environment:
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_DB: mydatabase
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+
+  service:
+    image: my-spring-boot-app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: my-java-service
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:h2:mem:testdb
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.h2.Driver
+      SPRING_DATASOURCE_USERNAME: sa
+      SPRING_DATASOURCE_PASSWORD: password
+      SPRING_H2_CONSOLE_ENABLED: 'true'
+    depends_on:
+      - database
+    ports:
+      - "8080:8080"
+
+  tests:
+    image: my-api-tests:lates
+    build:
+      context: .
+      dockerfile: Dockerfile.test
+    container_name: api-tests
+    depends_on:
+      - service
+    environment:
+      SERVICE_URL: http://service:8080
+
+volumes:
+    db-data:

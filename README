@@ -1,0 +1,14 @@
+
+```sh
+docker run -p 8080:8080 my-spring-boot-app
+
+docker-compose up --build
+
+
+```
+```sh
+docker ps
+docker stop <container_id>
+```
+
+./gradlew bootRun  - запуск проекту локально
